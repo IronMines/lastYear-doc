@@ -16,9 +16,64 @@
 
 Le projet Ironmines a été créé pour répondre offrir une interface de
 programmation pour faire évoluer le robot Kobuki. L'objectif est
-bien-sur de le faire concourir a la coupe de France de Robotique.
+bien-sur de le faire concourir à la coupe de France de Robotique.
 
+\section{Installation}
+
+À partir d'une distribution Raspbian vierge il faudra installer les
+dépendances suivantes :
+\begin{itemize}
+\item ROS - Kobuki
+\item Rosserial (pour communiquer avec l'Arduino)
+\item PhaROS - Ironmines
+\end{itemize}
+
+\subsection{ROS - Kobuki}
+
+Tout d'abord il faut installer ROS sur le Raspberry : 
+
+\begin{lstlisting}
+  sudo sh -c 'echo "deb http://64.91.227.57/repos/rospbian wheezy main" > /etc/apt/sources.list.d/rospbian.list'
+  wget http://64.91.227.57/repos/rospbian.key -O - | sudo apt-key add -
+
+  sudo apt-get update
+
+  sudo apt-get install ros-groovy-ros-comm
+  sudo rosdep init
+  rosdep update
+
+  echo "source /opt/ros/groovy/setup.bash" >> ~/.bashrc
+  echo "export ROS_HOSTNAME=localhost" >> ~/.bashrc
+  source ~/.bashrc
+\end{lstlisting}
+
+Puis installer les noeuds pour communiquer avec le Kobuki : 
+
+\begin{lstlisting}
+  sudo apt-get install ros-groovy-kobuki-node 
+  sudo apt-get install ros-groovy-kobuki-msgs
+  sudo apt-get install ros-groovy-kobuki-ftdi
+\end{lstlisting}
+
+On pourra alors tester l'installation en excutant dans un terminal :
+
+\begin{verbatim}
+  roscore
+\end{verbatim}
+
+Et dans un autre terminal : 
+
+\begin{verbatim}
+  roslaunch kobuki_node minimal.launch
+\end{verbatim}
+
+Si tout ce lance correctement, on peut passer à la suite.
+
+\subsection{Rosserial}
+  
 \section{Architecture}
+
+
 
 
 \end{document}
