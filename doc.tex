@@ -55,7 +55,7 @@ Puis installer les noeuds pour communiquer avec le Kobuki :
   sudo apt-get install ros-groovy-kobuki-ftdi
 \end{lstlisting}
 
-On pourra alors tester l'installation en excutant dans un terminal :
+On pourra alors tester l'installation en exécutant dans un terminal :
 
 \begin{verbatim}
   roscore
@@ -73,7 +73,38 @@ Si tout ce lance correctement, on peut passer à la suite.
   
 \section{Architecture}
 
+D'un façon générale, Pharo fait office d'intelligence. ROS ne fait que
+transmettre les message provenant de l'Arduino et du Kobuki au travers
+des noeuds Rosserial et Kobuki\_node.
+\begin{center}
+  \includegraphics[width=\linewidth]{./architecture.jpg}
+  \caption{Architecture générale}
+  \label{archi_generale}
+\end{center}
+\subsection{Arduino}
+Le code pour l'arduino se trouve a l'Url
+:\\ https://github.com/mattonem/ironmines-arduino.git.
 
+Basiquement, on utilise la librairie fournie par Rosserial pour
+pouvoir publier différents topics sur le port serie ainsi que souscrire
+a d'autre. On publie les données relatives au contacteur de démarrage
+et au capteurs ultrasons. On souscrit aux différents topics concernant
+les actions a effectuer (activer le canon, bouger le bras
+retractable).
 
+\subsubsection{Subscribed Topics}
+
+\begin{itemize}
+\item  todo
+\end{itemize}
+
+\subsubsection{Published Topics}
+
+\begin{itemize}
+\item \texttt{/sonar/<i> (std\_msgs/UInt16)}\\
+  Donne la distance au mur en face du sonar i.
+\item \texttt{/startTrigger (std\_msgs/Bool)}\\ 
+  Donne les fronts montant et descendant pour le cordon de demarrage.
+\end{itemize}
 
 \end{document}
