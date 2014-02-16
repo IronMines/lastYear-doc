@@ -33,10 +33,10 @@ entière du programme pour le développent. Il faudra alors installer :
 
 \subsubsection{ROS - Kobuki}
 
-Tout d'abord il faudra télécharger et installer l'utilitaire PhaROS
+Tout d'abord il faudra télé-charger et installer l'utilitaire PhaROS
 Tools, disponible à l'url :\\
 \url{http://car.mines-douai.fr/wp-content/uploads/2014/01/pharos.deb}
-Alors on pourra procéder à l'installation simplifier de phaROS :
+Alors on pourra procéder à l'installation simplifier de PhaROS :
 
 \begin{verbatim}
   pharos ros-install
@@ -66,18 +66,21 @@ Cependant ce projet requière les librairies Rosserial :
 \end{lstlisting}
 
 \subsubsection{PhaROS - Ironmines}
-Il est temps de passer a l'installation de phaROS et du projet
+Il est temps de passer a l'installation de PhaROS et du projet
 Ironmines. Toute la procédure est très simplifier avec l'outil PhaROS
 Tools bien-sur.
 
 \begin{lstlisting}
-  pharos register-repository --url="http://smalltalkhub.com/mc/maxmattone/ironmines/main" --package=IronMinesDirectory
+  phaROS register-repository --url="http://smalltalkhub.com/mc/maxmattone/ironmines/main" --package=IronMinesDirectory
   pharos install IronMines
 \end{lstlisting}
 
 \subsection{Raspberry}
-À partir d'une distribution Raspbian vierge il faudra installer les
-dépendances suivantes :
+L'objectif étant de faire fonctionner le kobuki sur Raspberry, voici
+la procédure que j'ai pu mettre sur pieds pour installer le projet. Je
+suppose qu'on dispose d'un Raspberry type B avec une distribution
+Raspbian fraîchement configurée ainsi qu'une connection internet
+viable.
 
 \subsubsection{ROS - Kobuki}
 Tout d'abord il faut installer ROS sur le Raspberry : 
@@ -121,7 +124,54 @@ Et dans un autre terminal :
 \end{verbatim}
 Si tout ce lance correctement, on peut passer à la suite.
 \subsubsection{Rosserial}
-  
+Comme on ne souhaite pas installer une version de développement,
+l'installation du paquet ros-groovy-rosserial suffira.
+\begin{lstlisting}
+  sudo apt-get install ros-groovy-rosserial-arduino
+  sudo apt-get install ros-groovy-rosserial
+\end{lstlisting}
+
+\subsubsection{PhaROS - IronMines}
+
+On pourra dans un premier temps copier le dossier
+\texttt{~/ros/workspace/src/IronMines} de la machine de développement
+sur le Raspberry au même endroit (il faudra corriger les chemins dans
+le script \texttt{bin/headless}). Ensuite il faudra télé-charger la
+machine Pharo compatible Raspberry :
+\url{https://ci.inria.fr/pharo-contribution/view/RaspberryPi/job/RaspberryPi-Cross-Compilation/lastSuccessfulBuild/artifact/vmSources/results.tar.gz}.
+Puis remplacer, intelligemment la machine de projet qui se trouve dans
+\texttt{vm/vm-files/}.
+À ce point, on teste notre programme ; On démarre le kobuki :
+\begin{verbatim}
+  roslaunch kobuki_node minimal.launch
+\end{verbatim}
+Puis on lance notre programme
+\begin{verbatim}
+  rosrun IronMines headless kobuki
+\end{verbatim}
+
+\section{Démarrer le kobuki}
+
+Pour démarrer l'ensemble des fonctionnalités du kobuki et de
+l'Arduino, on procédera comme suit :
+\begin{itemize}
+\item brancher Arduino, Raspberry (ou ordinateur de développement)
+\item démarrer le kobuki
+\item démarrer kobuki\_node sur l'ordinateur
+\begin{verbatim}
+  roslaunch kobuki_node minimal.launch
+\end{verbatim}
+\item démarrer Rosserial
+\begin{verbatim}
+  rosrun rosserial_python serial_node.py /dev/ttyACM0
+\end{verbatim}
+\item démarrer le programme
+\begin{verbatim}
+  rosrun IronMines headless kobuki
+\end{verbatim}
+\end{itemize}
+
+
 \section{Architecture}
 
 D'un façon générale, Pharo fait office d'intelligence. ROS ne fait que
@@ -133,7 +183,7 @@ des noeuds Rosserial et Kobuki\_node.
   \label{archi_generale}
 \end{center}
 \subsection{Arduino}
-Le code pour l'arduino se trouve a l'Url
+Le code pour l'Arduino se trouve a l'url
 :\\ \url{https://github.com/mattonem/ironminesarduino.git}.
 
 Basiquement, on utilise la librairie fournie par Rosserial pour
@@ -141,7 +191,7 @@ pouvoir publier différents topiques sur le port série ainsi que souscrire
 a d'autre. On publie les données relatives au contacteur de démarrage
 et au capteurs ultrasons. On souscrit aux différents topiques concernant
 les actions a effectuer (activer le canon, bouger le bras
-retractable).
+rétractable).
 
 \subsubsection{Subscribed Topics}
 
@@ -170,13 +220,13 @@ retractable).
 \end{center}
 
 Le point d'entrée dans le programme est \texttt{IronMinesPackage} et
-sa methode \texttt{scriptKobuki}. C'est cette méthode qui va lancer
-l'instantiation de l'ensemble des entités necessaires pour le
+sa méthode \texttt{scriptKobuki}. C'est cette méthode qui va lancer
+l'instantiation de l'ensemble des entités nécessaires pour le
 programme. Va suivre l'instantiation du \texttt{Controller} et son
-assiotiation avec les nodelets utilisées (ici on utilise uniquement
+association avec les nodelets utilisées (ici on utilise uniquement
 \texttt{PhaROSTransformationNodelet} et
 \texttt{KobukiNodelet}). \texttt{KobukiNodelet} s'occupe alors de la
-creation d'un objet \texttt{Kobuki}, qui est une représentation
+création d'un objet \texttt{Kobuki}, qui est une représentation
 logique du robot.
 
 On peut alors affecter au Kobuki des états. Ceux-ci représentent les
@@ -184,27 +234,27 @@ actions qu'on lui demandera de faire (ex: \texttt{EtatGoTo}). Un état
 hérite de la classe \texttt{Etat}, et peut définir dans la méthode
 \texttt{action} la (les) action(s) actions à effectuer. À la fin de
 l'action, si l'état doit finir et mener sur un autre état (ce n'est
-pas le cas de tous), on pourra alors appeler la methode
+pas le cas de tous), on pourra alors appeler la méthode
 \texttt{onFinish}. 
 
-Il existe differentes façon de sortir d'un etat. La premiere est
+Il existe différentes façon de sortir d'un état. La première est
 déclenché lorsque l'état est terminé (\texttt{onFinish}). Les autres
 peuvent être personnalisées : \texttt{onObstacle},
 \texttt{onBumperEvent}. Chacune de ces portes de sorties sont
-parametrées à l'intantiation par la factory. Exemple :
+paramétrées à l'instantiation par la factory. Exemple :
 
 \begin{code}
   newEtat := EtatFactory createGoTo: (0 @ 1) onObstable: unEtatdEvitement next: etatSuivant.
   kobuki changeEtat: newEtat.
-  "NB : je ne présente pas ici une interface finalisee, ces methodes sont suseptibles de changer"
+  "NB : je ne présente pas ici une interface finalisee, ces methodes sont susceptibles de changer"
 \end{code}
 
 Ici on crée un nouvel état qui demandera de kobuki de se rendre en
 \texttt{(0,1)}, puis de passer à l'état \texttt{etatSuivant}, mais en
 cas d'obstacle on passera a l'état \texttt{unEtatdEvitement}.  Comme
 on peut le voir dans le graphique d'objet suivant (représentant le
-kobuki au depart d'un script pour tirer sur le mammouth) les états
-peuvent former des graphs complexes.
+kobuki au départ d'un script pour tirer sur le mammouth) les états
+peuvent former des graphes complexes.
 \begin{center}
   \includegraphics[width=\linewidth]{./UMLObjectEtat.jpg}
   \caption{Diagramme d'objets}
