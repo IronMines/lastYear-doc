@@ -161,6 +161,54 @@ retractable).
   Donne les fronts montant et descendant pour le cordon de démarrage.
 \end{itemize}
 
+\subsection{PhaROS - Ironmines}
 
+\begin{center}
+  \includegraphics[width=\linewidth]{./UMLClass.jpg}
+  \caption{Diagramme de classe}
+  \label{dia_class}
+\end{center}
+
+Le point d'entrée dans le programme est \texttt{IronMinesPackage} et
+sa methode \texttt{scriptKobuki}. C'est cette méthode qui va lancer
+l'instantiation de l'ensemble des entités necessaires pour le
+programme. Va suivre l'instantiation du \texttt{Controller} et son
+assiotiation avec les nodelets utilisées (ici on utilise uniquement
+\texttt{PhaROSTransformationNodelet} et
+\texttt{KobukiNodelet}). \texttt{KobukiNodelet} s'occupe alors de la
+creation d'un objet \texttt{Kobuki}, qui est une représentation
+logique du robot.
+
+On peut alors affecter au Kobuki des états. Ceux-ci représentent les
+actions qu'on lui demandera de faire (ex: \texttt{EtatGoTo}). Un état
+hérite de la classe \texttt{Etat}, et peut définir dans la méthode
+\texttt{action} la (les) action(s) actions à effectuer. À la fin de
+l'action, si l'état doit finir et mener sur un autre état (ce n'est
+pas le cas de tous), on pourra alors appeler la methode
+\texttt{onFinish}. 
+
+Il existe differentes façon de sortir d'un etat. La premiere est
+déclenché lorsque l'état est terminé (\texttt{onFinish}). Les autres
+peuvent être personnalisées : \texttt{onObstacle},
+\texttt{onBumperEvent}. Chacune de ces portes de sorties sont
+parametrées à l'intantiation par la factory. Exemple :
+
+\begin{code}
+  newEtat := EtatFactory createGoTo: (0 @ 1) onObstable: unEtatdEvitement next: etatSuivant.
+  kobuki changeEtat: newEtat.
+  "NB : je ne présente pas ici une interface finalisee, ces methodes sont suseptibles de changer"
+\end{code}
+
+Ici on crée un nouvel état qui demandera de kobuki de se rendre en
+\texttt{(0,1)}, puis de passer à l'état \texttt{etatSuivant}, mais en
+cas d'obstacle on passera a l'état \texttt{unEtatdEvitement}.  Comme
+on peut le voir dans le graphique d'objet suivant (représentant le
+kobuki au depart d'un script pour tirer sur le mammouth) les états
+peuvent former des graphs complexes.
+\begin{center}
+  \includegraphics[width=\linewidth]{./UMLObjectEtat.jpg}
+  \caption{Diagramme d'objets}
+  \label{dia_obj}
+\end{center}
 
 \end{document}
