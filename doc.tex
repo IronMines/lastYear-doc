@@ -3,6 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 \usepackage[french]{babel}
 
@@ -19,19 +20,67 @@ programmation pour faire évoluer le robot Kobuki. L'objectif est
 bien-sur de le faire concourir à la coupe de France de Robotique.
 
 \section{Installation}
-
-À partir d'une distribution Raspbian vierge il faudra installer les
-dépendances suivantes :
+\subsection{Pour le développement}
+Le programme ironmines peut être installer sur n'importe quel machine
+linux compatible avec ROS groovy. On choisira Ubuntu 12.04 pour le
+développement. Cette partie expliquera comment installer une version
+entière du programme pour le développent. Il faudra alors installer :
 \begin{itemize}
 \item ROS - Kobuki
-\item Rosserial (pour communiquer avec l'Arduino)
+\item Arduino - Roserial
 \item PhaROS - Ironmines
 \end{itemize}
 
-\subsection{ROS - Kobuki}
+\subsubsection{ROS - Kobuki}
 
+Tout d'abord il faudra télécharger et installer l'utilitaire PhaROS
+Tools, disponible à l'url :\\
+\url{http://car.mines-douai.fr/wp-content/uploads/2014/01/pharos.deb}
+Alors on pourra procéder à l'installation simplifier de phaROS :
+
+\begin{verbatim}
+  pharos ros-install
+\end{verbatim}
+On pourra alors installer le kobuki :
+\begin{verbatim}
+  sudo apt-get install ros-groovy-kobuki-desktop
+\end{verbatim}
+
+\subsubsection{Arduino - Rosserial}
+
+On pourra installer l'IDE pour Arduino pour permettre d'éditer les
+sous-procédure utilisé : 
+\begin{lstlisting}
+  sudo apt-get arduino
+  cd ~/sketchbook
+  git clone https://github.com/mattonem/ironminesarduino.git
+\end{lstlisting}
+Cependant ce projet requière les librairies Rosserial :
+\begin{lstlisting}
+  cd ~/ros/workspace/src/
+  git clone https://github.com/ros-drivers/rosserial.git
+  cd ~/ros/workspace/
+  catkin_make
+  cd ~/sketchbook/libraries
+  rosrun rosserial_arduino make_libraries.py .
+\end{lstlisting}
+
+\subsubsection{PhaROS - Ironmines}
+Il est temps de passer a l'installation de phaROS et du projet
+Ironmines. Toute la procédure est très simplifier avec l'outil PhaROS
+Tools bien-sur.
+
+\begin{lstlisting}
+  pharos register-repository --url="http://smalltalkhub.com/mc/maxmattone/ironmines/main" --package=IronMinesDirectory
+  pharos install IronMines
+\end{lstlisting}
+
+\subsection{Raspberry}
+À partir d'une distribution Raspbian vierge il faudra installer les
+dépendances suivantes :
+
+\subsubsection{ROS - Kobuki}
 Tout d'abord il faut installer ROS sur le Raspberry : 
-
 \begin{lstlisting}
   sudo sh -c 'echo "deb http://64.91.227.57/repos/rospbian wheezy main" > /etc/apt/sources.list.d/rospbian.list'
   wget http://64.91.227.57/repos/rospbian.key -O - | sudo apt-key add -
@@ -39,37 +88,39 @@ Tout d'abord il faut installer ROS sur le Raspberry :
   sudo apt-get update
 
   sudo apt-get install ros-groovy-ros-comm
+  pip install --upgrade rosdistro
   sudo rosdep init
   rosdep update
 
   echo "source /opt/ros/groovy/setup.bash" >> ~/.bashrc
   echo "export ROS_HOSTNAME=localhost" >> ~/.bashrc
   source ~/.bashrc
+
+   mkdir -p ~/ros/workspace/src
+   cd ~/ros/workspace/src
+   catkin_init_workspace
+   cd ~/ros/workspace/
+   catkin_make
+   echo "source ~/ros/workspace/devel/setup.bash" >> ~/.bashrc
 \end{lstlisting}
-
 Puis installer les noeuds pour communiquer avec le Kobuki : 
-
 \begin{lstlisting}
+  sudo apt-get install ros-groovy-diagnostics
   sudo apt-get install ros-groovy-kobuki-node 
   sudo apt-get install ros-groovy-kobuki-msgs
   sudo apt-get install ros-groovy-kobuki-ftdi
+  rosrun kobuki_ftdi create_udev_rules
 \end{lstlisting}
-
 On pourra alors tester l'installation en exécutant dans un terminal :
-
 \begin{verbatim}
   roscore
 \end{verbatim}
-
 Et dans un autre terminal : 
-
 \begin{verbatim}
   roslaunch kobuki_node minimal.launch
 \end{verbatim}
-
 Si tout ce lance correctement, on peut passer à la suite.
-
-\subsection{Rosserial}
+\subsubsection{Rosserial}
   
 \section{Architecture}
 
@@ -83,28 +134,33 @@ des noeuds Rosserial et Kobuki\_node.
 \end{center}
 \subsection{Arduino}
 Le code pour l'arduino se trouve a l'Url
-:\\ https://github.com/mattonem/ironmines-arduino.git.
+:\\ \url{https://github.com/mattonem/ironminesarduino.git}.
 
 Basiquement, on utilise la librairie fournie par Rosserial pour
-pouvoir publier différents topics sur le port serie ainsi que souscrire
+pouvoir publier différents topiques sur le port série ainsi que souscrire
 a d'autre. On publie les données relatives au contacteur de démarrage
-et au capteurs ultrasons. On souscrit aux différents topics concernant
+et au capteurs ultrasons. On souscrit aux différents topiques concernant
 les actions a effectuer (activer le canon, bouger le bras
 retractable).
 
 \subsubsection{Subscribed Topics}
 
 \begin{itemize}
-\item  todo
+\item \texttt{/canonTrigger (std\_msgs/Bool)}\\ 
+  Si msg.data == true :
+  déclenche l'électrovanne pour faire tirer le canon.
 \end{itemize}
 
 \subsubsection{Published Topics}
 
 \begin{itemize}
 \item \texttt{/sonar/<i> (std\_msgs/UInt16)}\\
-  Donne la distance au mur en face du sonar i.
+  Donne la distance au mur en face du sonar \texttt{i}.\\
+  Aujourd'hui, \texttt{i} est compris entre 0 et 4
 \item \texttt{/startTrigger (std\_msgs/Bool)}\\ 
-  Donne les fronts montant et descendant pour le cordon de demarrage.
+  Donne les fronts montant et descendant pour le cordon de démarrage.
 \end{itemize}
+
+
 
 \end{document}
