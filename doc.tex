@@ -24,7 +24,8 @@ bien-sur de le faire concourir à la coupe de France de Robotique.
 Le programme ironmines peut être installer sur n'importe quel machine
 linux compatible avec ROS groovy. On choisira Ubuntu 12.04 pour le
 développement. Cette partie expliquera comment installer une version
-entière du programme pour le développent. Il faudra alors installer :
+entière du programme pour le développent. Les étapes sont les
+suivantes :
 \begin{itemize}
 \item ROS - Kobuki
 \item Arduino - Roserial
@@ -106,7 +107,7 @@ Tout d'abord il faut installer ROS sur le Raspberry :
    catkin_make
    echo "source ~/ros/workspace/devel/setup.bash" >> ~/.bashrc
 \end{lstlisting}
-Puis installer les noeuds pour communiquer avec le Kobuki : 
+Puis installer les n{\oe}uds pour communiquer avec le Kobuki : 
 \begin{lstlisting}
   sudo apt-get install ros-groovy-diagnostics
   sudo apt-get install ros-groovy-kobuki-node 
@@ -176,7 +177,7 @@ l'Arduino, on procédera comme suit :
 
 D'un façon générale, Pharo fait office d'intelligence. ROS ne fait que
 transmettre les message provenant de l'Arduino et du Kobuki au travers
-des noeuds Rosserial et Kobuki\_node.
+des n{\oe}uds Rosserial et Kobuki\_node.
 \begin{center}
   \includegraphics[width=\linewidth]{./architecture.jpg}
   \caption{Architecture générale}
@@ -188,7 +189,7 @@ Le code pour l'Arduino se trouve a l'url
 
 Basiquement, on utilise la librairie fournie par Rosserial pour
 pouvoir publier différents topiques sur le port série ainsi que souscrire
-a d'autre. On publie les données relatives au contacteur de démarrage
+à d'autre. On publie les données relatives au contacteur de démarrage
 et au capteurs ultrasons. On souscrit aux différents topiques concernant
 les actions a effectuer (activer le canon, bouger le bras
 rétractable).
