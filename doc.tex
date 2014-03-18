@@ -15,13 +15,13 @@
 
 \section{Introduction}
 
-Le projet Ironmines a été créé pour offrir une interface de
-programmation pour faire évoluer le robot Kobuki. L'objectif est
-bien-sur de le faire concourir à la coupe de France de Robotique.
+Le projet Ironmines offre une interface de programmation pour faire
+évoluer le robot Kobuki. L'objectif est bien-sur de le faire concourir
+à la coupe de France de Robotique.
 
 \section{Installation}
 \subsection{Pour le développement}
-Le programme ironmines peut être installer sur n'importe quel machine
+Le programme ironmines peut être installer sur n'importe quelle machine
 linux compatible avec ROS groovy. On choisira Ubuntu 12.04 pour le
 développement. Cette partie expliquera comment installer une version
 entière du programme pour le développent. Les étapes sont les
@@ -37,20 +37,20 @@ suivantes :
 Tout d'abord il faudra télé-charger et installer l'utilitaire PhaROS
 Tools, disponible à l'url :\\
 \url{http://car.mines-douai.fr/wp-content/uploads/2014/01/pharos.deb}
-Alors on pourra procéder à l'installation simplifier de PhaROS :
+Alors on pourra procéder à l'installation simplifiée de PhaROS :
 
 \begin{verbatim}
   pharos ros-install
 \end{verbatim}
-On pourra alors installer le kobuki :
+On pourra ensuite installer le kobuki :
 \begin{verbatim}
   sudo apt-get install ros-groovy-kobuki-desktop
 \end{verbatim}
 
 \subsubsection{Arduino - Rosserial}
 
-On pourra installer l'IDE pour Arduino pour permettre d'éditer les
-sous-procédure utilisé : 
+On pourra installer l'IDE pour Arduino qui permet d'éditer les
+sous-procédure utilisé :
 \begin{lstlisting}
   sudo apt-get arduino
   cd ~/sketchbook
@@ -68,7 +68,7 @@ Cependant ce projet requière les librairies Rosserial :
 
 \subsubsection{PhaROS - Ironmines}
 Il est temps de passer a l'installation de PhaROS et du projet
-Ironmines. Toute la procédure est très simplifier avec l'outil PhaROS
+Ironmines. Toute la procédure est très simplifiée avec l'outil PhaROS
 Tools bien-sur.
 
 \begin{lstlisting}
@@ -77,7 +77,10 @@ Tools bien-sur.
 \end{lstlisting}
 
 \subsection{Raspberry}
-L'objectif étant de faire fonctionner le kobuki sur Raspberry, voici
+
+L'objectif étant de faire fonctionner le kobuki sur
+Raspberry\footnote{NB : Après test le Raspberry n'est pas assez
+  puissant pour gérer le déplacement et l'odométrie ensemble.}, voici
 la procédure que j'ai pu mettre sur pieds pour installer le projet. Je
 suppose qu'on dispose d'un Raspberry type B avec une distribution
 Raspbian fraîchement configurée ainsi qu'une connection internet
@@ -176,7 +179,7 @@ l'Arduino, on procédera comme suit :
 \section{Architecture}
 
 D'un façon générale, Pharo fait office d'intelligence. ROS ne fait que
-transmettre les message provenant de l'Arduino et du Kobuki au travers
+transmettre les messages provenant de l'Arduino et du Kobuki au travers
 des n{\oe}uds Rosserial et Kobuki\_node.
 \begin{center}
   \includegraphics[width=\linewidth]{./architecture.jpg}
@@ -189,9 +192,9 @@ Le code pour l'Arduino se trouve a l'url
 
 Basiquement, on utilise la librairie fournie par Rosserial pour
 pouvoir publier différents topiques sur le port série ainsi que souscrire
-à d'autre. On publie les données relatives au contacteur de démarrage
+à d'autres. On publie les données relatives au contacteur de démarrage
 et au capteurs ultrasons. On souscrit aux différents topiques concernant
-les actions a effectuer (activer le canon, bouger le bras
+les actions à effectuer (activer le canon, bouger le bras
 rétractable).
 
 \subsubsection{Subscribed Topics}
@@ -207,7 +210,7 @@ rétractable).
 \begin{itemize}
 \item \texttt{/sonar/<i> (std\_msgs/UInt16)}\\
   Donne la distance au mur en face du sonar \texttt{i}.\\
-  Aujourd'hui, \texttt{i} est compris entre 0 et 4
+  Aujourd'hui, \texttt{i} est compris entre 2 et 7
 \item \texttt{/startTrigger (std\_msgs/Bool)}\\ 
   Donne les fronts montant et descendant pour le cordon de démarrage.
 \end{itemize}
@@ -250,7 +253,7 @@ paramétrées à l'instantiation par la factory. Exemple :
   "NB : je ne présente pas ici une interface finalisee, ces methodes sont susceptibles de changer"
 \end{code}
 
-Ici on crée un nouvel état qui demandera de kobuki de se rendre en
+Ici on crée un nouvel état qui demandera au kobuki de se rendre en
 \texttt{(0,1)}, puis de passer à l'état \texttt{etatSuivant}, mais en
 cas d'obstacle on passera a l'état \texttt{unEtatdEvitement}.  Comme
 on peut le voir dans le graphique d'objet suivant (représentant le
